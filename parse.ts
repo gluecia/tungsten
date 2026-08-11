@@ -57,7 +57,7 @@ class HeadingExpr implements Expr {
             output += "#";
         }
 
-        return output + " " + this.inner.render()
+        return output + this.inner.render()
     }
 }
 
@@ -95,13 +95,34 @@ export class Scanner {
         const c = this.advance();
 
         switch (c) {
-            case '*':
+            case "*":
                 return this.heading();
+            case "/":
+                return this.surroundExpr("/", "*");
+            case "%":
+                return this.surroundExpr("%", "**");
             default:
                 return this.string();
         }
     }
 
+    private surroundExpr(surroundCharacter: string, replaceCharacter: string): SurroundExpr {
+        this.start = this.current;
+        while (this.peek() !== surroundCharacter && !this.isAtEnd()) {
+            this.advance();
+        }
+
+        this.advance()
+
+        const scanner = new Scanner(this.source.substring(this.start, this.current - 1));
+        const inner = scanner.scan();
+        return new SurroundExpr(inner, replaceCharacter);
+    }
+
+    /**
+     * Parses a heading.
+     * @returns A HeadingExpr containing the heading level and the text.
+     */
     private heading(): HeadingExpr {
         let headingLevel = 1;
         while (this.peek() === "*" && !this.isAtEnd()) {
@@ -122,18 +143,22 @@ export class Scanner {
         return new HeadingExpr(inner, headingLevel);
     }
 
+    /**
+     * Parses a string of characters.
+     * @returns A StringExpr containing all characters in the string.
+     */
     private string(): StringExpr {
-        const specialCharacters = /\*/;
+        const specialCharacters = /[%\/]/;
 
-        this.start = this.current;
-        if (!specialCharacters.test(this.peek()) && !this.isAtEnd()) {
+        this.start = this.current - 1;
+        while (!specialCharacters.test(this.peek()) && !this.isAtEnd()) {
             const c = this.advance();
             if (c === '\\' && !this.isAtEnd()) {
                 this.advance();
             }
         }
 
-        return new StringExpr(this.source.substring(this.start, this.current + 1));
+        return new StringExpr(this.source.substring(this.start, this.current));
     }
 
     private isAtEnd(): boolean {
@@ -151,5 +176,5 @@ export class Scanner {
     }
 }
 
-const scan = new Scanner("** hello!");
+const scan = new Scanner("/fsfds/ dfds /sdfds/ %hello%");
 console.log(scan.scan().render())

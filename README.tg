@@ -18,12 +18,3 @@ Tungsten is markup language, inspired by [Org mode|https://orgmode.org/] for Ema
 
 ** Links
 `{title|link}`
-
-/italics *bold italics*/
-
-italic
-    string
-        italics
-    bold
-        string
-            bold italics
