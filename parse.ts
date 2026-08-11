@@ -38,7 +38,7 @@ export class CodeExpr implements Expr {
     }
 
     render(): string {
-        return `\`\`\`${this.language}\n${this.inner}\n\`\`\``
+        return `\`\`\`${this.language}\n${this.inner}\n\`\`\``;
     }
 }
 
@@ -57,7 +57,7 @@ export class HeadingExpr implements Expr {
             output += "#";
         }
 
-        return output + this.inner.render()
+        return output + this.inner.render();
     }
 }
 
@@ -83,7 +83,7 @@ class RootExpr implements Expr {
     }
 
     render(): string {
-        return this.inner.reduce((acc, expr) => acc += expr.render(), "");
+        return this.inner.reduce((acc, expr) => (acc += expr.render()), "");
     }
 }
 
@@ -122,15 +122,20 @@ export class Scanner {
         }
     }
 
-    private surroundExpr(surroundCharacter: string, replaceCharacter: string): SurroundExpr {
+    private surroundExpr(
+        surroundCharacter: string,
+        replaceCharacter: string,
+    ): SurroundExpr {
         this.start = this.current;
         while (this.peek() !== surroundCharacter && !this.isAtEnd()) {
             this.advance();
         }
 
-        this.advance()
+        this.advance();
 
-        const scanner = new Scanner(this.source.substring(this.start, this.current - 1));
+        const scanner = new Scanner(
+            this.source.substring(this.start, this.current - 1),
+        );
         const inner = scanner.scan();
         return new SurroundExpr(inner, replaceCharacter);
     }
@@ -154,7 +159,9 @@ export class Scanner {
 
         this.advance();
 
-        const scanner = new Scanner(this.source.substring(this.start, this.current));
+        const scanner = new Scanner(
+            this.source.substring(this.start, this.current),
+        );
         const inner = scanner.scan();
         return new HeadingExpr(inner, headingLevel);
     }
@@ -169,7 +176,7 @@ export class Scanner {
         this.start = this.current - 1;
         while (!specialCharacters.test(this.peek()) && !this.isAtEnd()) {
             const c = this.advance();
-            if (c === '\\' && !this.isAtEnd()) {
+            if (c === "\\" && !this.isAtEnd()) {
                 this.advance();
             }
         }
@@ -183,7 +190,9 @@ export class Scanner {
         }
 
         if (this.isAtEnd()) {
-            return new StringExpr(this.source.substring(start - 1, this.current));
+            return new StringExpr(
+                this.source.substring(start - 1, this.current),
+            );
         }
 
         const title = this.source.substring(start, this.current);
@@ -195,7 +204,9 @@ export class Scanner {
         }
 
         if (this.isAtEnd()) {
-            return new StringExpr(this.source.substring(start - 1, this.current));
+            return new StringExpr(
+                this.source.substring(start - 1, this.current),
+            );
         }
 
         const link = this.source.substring(start2, this.current);
