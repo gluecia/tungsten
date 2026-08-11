@@ -58,6 +58,11 @@ Deno.test("Heading", async (t) => {
     const scanner = new Scanner("* /italics/ %bold%");
     assertEquals(scanner.scan().render(), "# *italics* **bold**");
   });
+
+  await t.step("Midline", () => {
+    const scanner = new Scanner("test * H1");
+    assertEquals(scanner.scan().render(), "test * H1");
+  })
 });
 
 Deno.test("Links", async (t) => {

@@ -171,13 +171,15 @@ export class Scanner {
    * @returns A StringExpr containing all characters in the string.
    */
   private string(): StringExpr {
-    const specialCharacters = /[%\/\*\[]/;
+    const specialCharacters = /[%\/\[]/;
 
     this.start = this.current - 1;
     while (!specialCharacters.test(this.peek()) && !this.isAtEnd()) {
       const c = this.advance();
       if (c === "\\" && !this.isAtEnd()) {
         this.advance();
+      } else if (c === "\n") {
+        break;
       }
     }
     return new StringExpr(this.source.substring(this.start, this.current));
