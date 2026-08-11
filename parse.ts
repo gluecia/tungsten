@@ -93,7 +93,6 @@ export class Scanner {
   private start: number = 0;
   private exprList: Expr[] = [];
 
-
   constructor(source: string) {
     this.source = source;
   }

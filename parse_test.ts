@@ -21,6 +21,11 @@ Deno.test("Text", async (t) => {
       "# H1\nHello! This is *italic* and this is **bold**!",
     );
   });
+
+  await t.step("Escaping Characters", () => {
+    const scanner = new Scanner("\\/not italic\\c/");
+    assertEquals(scanner.scan().render(), "/not italic/");
+  })
 });
 
 Deno.test("Heading", async (t) => {
@@ -73,4 +78,26 @@ Deno.test("Links", async (t) => {
       "This is a [test link](test.com/testing)!",
     );
   });
+});
+
+Deno.test("Code", async (t) => {
+  await t.step("Inline 1", () => {
+    const scanner = new Scanner("`test`");
+    assertEquals(scanner.scan().render(), "`test`");
+  });
+
+  await t.step("Inline 2", () => {
+    const scanner = new Scanner("this is a `test`");
+    assertEquals(scanner.scan().render(), "this is a `test`");
+  });
+
+  await t.step("Inline with Markup", () => {
+    const scanner = new Scanner("`should not be %bold%`");
+    assertEquals(scanner.scan().render(), "`should not be %bold%`");
+  });
+
+  await t.step("Inline with Markup 2", () => {
+    const scanner = new Scanner("`should not be /italic/`");
+    assertEquals(scanner.scan().render(), "`should not be /italic/`");
+  })
 });

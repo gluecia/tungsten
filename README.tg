@@ -3,18 +3,18 @@ Tungsten is markup language, inspired by [Org mode|https://orgmode.org/] for Ema
 
 * Syntax
 ** Heading
-#
+``
 * H1
 ** H2
 *** H3
-#
+``
 
 ** Text Styles
-#
+``
 %bold%
 /italic/
 `code`
-#
+``
 
 ** Links
 `[title|link]`
