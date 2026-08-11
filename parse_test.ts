@@ -22,10 +22,15 @@ Deno.test("Text", async (t) => {
     );
   });
 
-  await t.step("Escaping Characters", () => {
-    const scanner = new Scanner("\\/not italic\\c/");
+  await t.step("Escaping Characters 1", () => {
+    const scanner = new Scanner(String.raw`\/not italic\/`);
     assertEquals(scanner.scan().render(), "/not italic/");
   });
+
+  await t.step("Escaping Characters 2", () => {
+    const scanner = new Scanner(`\\\\`);
+    assertEquals(scanner.scan().render(), "\\")
+  })
 });
 
 Deno.test("Heading", async (t) => {
@@ -96,7 +101,7 @@ Deno.test("Code", async (t) => {
     assertEquals(scanner.scan().render(), "this is a `test`");
   });
 
-  await t.step("Inline with Markup", () => {
+  await t.step("Inline with Markup 1", () => {
     const scanner = new Scanner("`should not be %bold%`");
     assertEquals(scanner.scan().render(), "`should not be %bold%`");
   });

@@ -174,15 +174,20 @@ export class Scanner {
     const specialCharacters = /[%\/\[]/;
 
     this.start = this.current - 1;
+    if (this.source.charAt(this.start) === "\\" && !this.isAtEnd()) {
+      this.advance();
+    }
+
     while (!specialCharacters.test(this.peek()) && !this.isAtEnd()) {
       const c = this.advance();
+
       if (c === "\\" && !this.isAtEnd()) {
         this.advance();
       } else if (c === "\n") {
         break;
       }
     }
-    return new StringExpr(this.source.substring(this.start, this.current));
+    return new StringExpr(this.source.substring(this.start, this.current).replace(/(\\)(.)/gm, '$2'));
   }
 
   private link(): Expr {
