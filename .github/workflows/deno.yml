@@ -35,7 +35,7 @@ jobs:
       # - name: Verify formatting
       #   run: deno fmt --check
       - name: Install packages
-        run: deno install
+        run: deno add jsr:@std/assert@1
 
       - name: Run linter
         run: deno lint
