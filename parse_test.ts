@@ -1,5 +1,5 @@
 import { LinkExpr, Scanner } from "./parse.ts";
-import { assertEquals } from "jsr:@std/assert";
+import { assertEquals } from "@std/assert@1";
 
 Deno.test("Text", async (t) => {
     await t.step("Single Line", () => {
