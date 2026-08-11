@@ -25,7 +25,7 @@ Deno.test("Text", async (t) => {
   await t.step("Escaping Characters", () => {
     const scanner = new Scanner("\\/not italic\\c/");
     assertEquals(scanner.scan().render(), "/not italic/");
-  })
+  });
 });
 
 Deno.test("Heading", async (t) => {
@@ -99,5 +99,5 @@ Deno.test("Code", async (t) => {
   await t.step("Inline with Markup 2", () => {
     const scanner = new Scanner("`should not be /italic/`");
     assertEquals(scanner.scan().render(), "`should not be /italic/`");
-  })
+  });
 });
