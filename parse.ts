@@ -127,7 +127,7 @@ export class Scanner {
         let headingLevel = 1;
         while (this.peek() === "*" && !this.isAtEnd()) {
             this.advance();
-            headingLevel++;
+            headingLevel += 1;
         }
 
         this.start = this.current;
@@ -136,9 +136,9 @@ export class Scanner {
             this.advance();
         }
 
-        this.advance()
+        this.advance();
 
-        const scanner = new Scanner(this.source.substring(this.start, this.current + 1));
+        const scanner = new Scanner(this.source.substring(this.start, this.current));
         const inner = scanner.scan();
         return new HeadingExpr(inner, headingLevel);
     }
@@ -148,7 +148,7 @@ export class Scanner {
      * @returns A StringExpr containing all characters in the string.
      */
     private string(): StringExpr {
-        const specialCharacters = /[%\/]/;
+        const specialCharacters = /[%\/\*]/;
 
         this.start = this.current - 1;
         while (!specialCharacters.test(this.peek()) && !this.isAtEnd()) {
@@ -157,7 +157,6 @@ export class Scanner {
                 this.advance();
             }
         }
-
         return new StringExpr(this.source.substring(this.start, this.current));
     }
 
@@ -175,6 +174,3 @@ export class Scanner {
         return this.source.charAt(this.current);
     }
 }
-
-const scan = new Scanner("/fsfds/ dfds /sdfds/ %hello%");
-console.log(scan.scan().render())
