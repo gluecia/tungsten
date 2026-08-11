@@ -2,7 +2,7 @@ interface Expr {
     render(): string;
 }
 
-class SurroundExpr implements Expr {
+export class SurroundExpr implements Expr {
     readonly surroundChar: string;
     readonly inner: Expr;
 
@@ -16,7 +16,7 @@ class SurroundExpr implements Expr {
     }
 }
 
-class StringExpr implements Expr {
+export class StringExpr implements Expr {
     readonly inner: string;
 
     constructor(inner: string) {
@@ -28,7 +28,7 @@ class StringExpr implements Expr {
     }
 }
 
-class CodeExpr implements Expr {
+export class CodeExpr implements Expr {
     readonly language: string;
     readonly inner: string;
 
@@ -42,7 +42,7 @@ class CodeExpr implements Expr {
     }
 }
 
-class HeadingExpr implements Expr {
+export class HeadingExpr implements Expr {
     readonly level: number;
     readonly inner: Expr;
 
@@ -58,6 +58,20 @@ class HeadingExpr implements Expr {
         }
 
         return output + this.inner.render()
+    }
+}
+
+export class LinkExpr implements Expr {
+    readonly title: string;
+    readonly link: string;
+
+    constructor(title: string, link: string) {
+        this.title = title;
+        this.link = link;
+    }
+
+    render(): string {
+        return `[${this.title}](${this.link})`;
     }
 }
 
@@ -101,6 +115,8 @@ export class Scanner {
                 return this.surroundExpr("/", "*");
             case "%":
                 return this.surroundExpr("%", "**");
+            case "[":
+                return this.link();
             default:
                 return this.string();
         }
@@ -148,7 +164,7 @@ export class Scanner {
      * @returns A StringExpr containing all characters in the string.
      */
     private string(): StringExpr {
-        const specialCharacters = /[%\/\*]/;
+        const specialCharacters = /[%\/\*\[]/;
 
         this.start = this.current - 1;
         while (!specialCharacters.test(this.peek()) && !this.isAtEnd()) {
@@ -158,6 +174,34 @@ export class Scanner {
             }
         }
         return new StringExpr(this.source.substring(this.start, this.current));
+    }
+
+    private link(): Expr {
+        const start = this.current;
+        while (this.peek() !== "|" && !this.isAtEnd()) {
+            this.advance();
+        }
+
+        if (this.isAtEnd()) {
+            return new StringExpr(this.source.substring(start - 1, this.current));
+        }
+
+        const title = this.source.substring(start, this.current);
+        this.advance();
+
+        const start2 = this.current;
+        while (this.peek() !== "]" && !this.isAtEnd()) {
+            this.advance();
+        }
+
+        if (this.isAtEnd()) {
+            return new StringExpr(this.source.substring(start - 1, this.current));
+        }
+
+        const link = this.source.substring(start2, this.current);
+        this.advance();
+
+        return new LinkExpr(title, link);
     }
 
     private isAtEnd(): boolean {
