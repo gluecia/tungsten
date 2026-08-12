@@ -12,6 +12,7 @@ function runFile(filename: string) {
 }
 
 function repl() {
+  console.log("Welcome to the Tungsten REPL! Type 'quit' to exit.");
   while (true) {
     const input = prompt("> ");
 
