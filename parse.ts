@@ -29,16 +29,14 @@ export class StringExpr implements Expr {
 }
 
 export class CodeExpr implements Expr {
-  readonly language: string;
   readonly inner: string;
 
-  constructor(inner: string, language: string) {
+  constructor(inner: string) {
     this.inner = inner;
-    this.language = language;
   }
 
   render(): string {
-    return `\`\`\`${this.language}\n${this.inner}\n\`\`\``;
+    return `\`\`\`${this.inner}\`\`\``;
   }
 }
 
@@ -118,11 +116,9 @@ export class Scanner {
       case "[":
         return this.link();
       case "`":
-        if (this.match("`")) {
-          this.codeBlock();
-        } else {
-          return this.inlineCode();
-        }
+        return this.inlineCode();
+      case "#":
+        return this.codeBlock();
       default:
         return this.string();
     }
@@ -208,7 +204,10 @@ export class Scanner {
     }
 
     if (this.isAtEnd()) {
-      return new RootExpr([new StringExpr("["), new Scanner(this.source.substring(start, this.current)).scan()]);
+      return new RootExpr([
+        new StringExpr("["),
+        new Scanner(this.source.substring(start, this.current)).scan(),
+      ]);
     }
 
     const title = this.source.substring(start, this.current);
@@ -220,7 +219,12 @@ export class Scanner {
     }
 
     if (this.isAtEnd()) {
-      return new RootExpr([new StringExpr("["), new Scanner(title).scan(), new StringExpr("|"), new Scanner(this.source.substring(start2, this.current)).scan()]);
+      return new RootExpr([
+        new StringExpr("["),
+        new Scanner(title).scan(),
+        new StringExpr("|"),
+        new Scanner(this.source.substring(start2, this.current)).scan(),
+      ]);
     }
 
     const link = this.source.substring(start2, this.current);
@@ -239,13 +243,37 @@ export class Scanner {
     }
 
     if (this.isAtEnd()) {
-      const scanner = new Scanner(this.source.substring(this.start + 1, this.current));
+      const scanner = new Scanner(
+        this.source.substring(this.start + 1, this.current),
+      );
       return new RootExpr([new StringExpr("`"), scanner.scan()]);
     }
 
     this.advance();
 
     return new StringExpr(this.source.substring(this.start, this.current));
+  }
+
+  private codeBlock(): Expr {
+    this.start = this.current;
+
+    while (this.peek() != "#" && !this.isAtEnd()) {
+      const c = this.advance();
+
+      if (c === "\\" && !this.isAtEnd()) {
+        this.advance();
+      }
+    }
+
+    if (this.isAtEnd()) {
+      return new RootExpr([
+        new StringExpr("#"),
+        new Scanner(this.source.substring(this.start, this.current)).scan(),
+      ]);
+    }
+
+    this.advance();
+    return new CodeExpr(this.source.substring(this.start, this.current - 1));
   }
 
   private isAtEnd(): boolean {
@@ -260,14 +288,5 @@ export class Scanner {
     if (this.isAtEnd()) return "\0";
 
     return this.source.charAt(this.current);
-  }
-
-  private match(char: string): boolean {
-    if (this.peek() === char) {
-      this.advance();
-      return true;
-    }
-
-    return false;
   }
 }

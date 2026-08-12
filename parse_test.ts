@@ -41,12 +41,17 @@ Deno.test("Text", async (t) => {
   await t.step("Unclosed Link 1", () => {
     const scanner = new Scanner("[%bold%");
     assertEquals(scanner.scan().render(), "[**bold**");
-  })
+  });
 
   await t.step("Unclosed Link 2", () => {
     const scanner = new Scanner("[%bold%|/italic");
     assertEquals(scanner.scan().render(), "[**bold**|*italic*");
-  })
+  });
+
+  await t.step("Unclosed Code Block", () => {
+    const scanner = new Scanner("#\n%bold%");
+    assertEquals(scanner.scan().render(), "#\n**bold**");
+  });
 });
 
 Deno.test("Heading", async (t) => {
@@ -125,5 +130,15 @@ Deno.test("Code", async (t) => {
   await t.step("Inline with Markup 2", () => {
     const scanner = new Scanner("`should not be /italic/`");
     assertEquals(scanner.scan().render(), "`should not be /italic/`");
+  });
+
+  await t.step("Block", () => {
+    const scanner = new Scanner("#\ntest\n#");
+    assertEquals(scanner.scan().render(), "```\ntest\n```");
+  });
+
+  await t.step("Block with Language", () => {
+    const scanner = new Scanner("#ts\ntest\n#");
+    assertEquals(scanner.scan().render(), "```ts\ntest\n```");
   });
 });
