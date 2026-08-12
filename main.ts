@@ -16,5 +16,5 @@ if (args.length === 1) {
 } else if (args === 0) {
   repl();
 } else {
-  console.error("Usage: deno run parse <filename>")
+  console.error("Usage: deno task parse <filename>")
 }
