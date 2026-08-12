@@ -192,6 +192,8 @@ export class Scanner {
     this.start = this.current - 1;
     if (this.source.charAt(this.start) === "\\" && !this.isAtEnd()) {
       this.advance();
+    } else if (this.source.charAt(this.start) === "\n") {
+      return new StringExpr("\n");
     }
 
     while (!specialCharacters.test(this.peek()) && !this.isAtEnd()) {

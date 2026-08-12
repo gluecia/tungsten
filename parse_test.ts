@@ -76,8 +76,8 @@ Deno.test("Heading", async (t) => {
   });
 
   await t.step("New Line", () => {
-    const scanner = new Scanner("Test!\n* H1");
-    assertEquals(scanner.scan().render(), "Test!\n# H1");
+    const scanner = new Scanner("Test!\n\n* H1");
+    assertEquals(scanner.scan().render(), "Test!\n\n# H1");
   });
 
   await t.step("Markup", () => {
