@@ -31,6 +31,22 @@ Deno.test("Text", async (t) => {
     const scanner = new Scanner(`\\\\`);
     assertEquals(scanner.scan().render(), "\\");
   });
+
+  await t.step("Unclosed Code", () => {
+    const scanner = new Scanner("`hello %world%");
+    console.log(scanner.scan());
+    assertEquals(scanner.scan().render(), "`hello **world**");
+  });
+
+  await t.step("Unclosed Link 1", () => {
+    const scanner = new Scanner("[%bold%");
+    assertEquals(scanner.scan().render(), "[**bold**");
+  })
+
+  await t.step("Unclosed Link 2", () => {
+    const scanner = new Scanner("[%bold%|/italic");
+    assertEquals(scanner.scan().render(), "[**bold**|*italic*");
+  })
 });
 
 Deno.test("Heading", async (t) => {

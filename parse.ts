@@ -117,6 +117,12 @@ export class Scanner {
         return this.surroundExpr("%", "**");
       case "[":
         return this.link();
+      case "`":
+        if (this.match("`")) {
+          this.codeBlock();
+        } else {
+          return this.inlineCode();
+        }
       default:
         return this.string();
     }
@@ -202,9 +208,7 @@ export class Scanner {
     }
 
     if (this.isAtEnd()) {
-      return new StringExpr(
-        this.source.substring(start - 1, this.current),
-      );
+      return new RootExpr([new StringExpr("["), new Scanner(this.source.substring(start, this.current)).scan()]);
     }
 
     const title = this.source.substring(start, this.current);
@@ -216,15 +220,32 @@ export class Scanner {
     }
 
     if (this.isAtEnd()) {
-      return new StringExpr(
-        this.source.substring(start - 1, this.current),
-      );
+      return new RootExpr([new StringExpr("["), new Scanner(title).scan(), new StringExpr("|"), new Scanner(this.source.substring(start2, this.current)).scan()]);
     }
 
     const link = this.source.substring(start2, this.current);
     this.advance();
 
     return new LinkExpr(title, link);
+  }
+
+  private inlineCode(): Expr {
+    this.start = this.current - 1;
+    while (this.peek() !== "`" && !this.isAtEnd()) {
+      const c = this.advance();
+      if (c === "\\") {
+        this.advance();
+      }
+    }
+
+    if (this.isAtEnd()) {
+      const scanner = new Scanner(this.source.substring(this.start + 1, this.current));
+      return new RootExpr([new StringExpr("`"), scanner.scan()]);
+    }
+
+    this.advance();
+
+    return new StringExpr(this.source.substring(this.start, this.current));
   }
 
   private isAtEnd(): boolean {
@@ -239,5 +260,14 @@ export class Scanner {
     if (this.isAtEnd()) return "\0";
 
     return this.source.charAt(this.current);
+  }
+
+  private match(char: string): boolean {
+    if (this.peek() === char) {
+      this.advance();
+      return true;
+    }
+
+    return false;
   }
 }
