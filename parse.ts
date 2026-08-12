@@ -95,6 +95,10 @@ export class Scanner {
     this.source = source;
   }
 
+  /**
+   * Parses all the code.
+   * @returns The RootExpr of the tree.
+   */
   scan(): RootExpr {
     while (!this.isAtEnd()) {
       this.exprList.push(this.scanToken());
@@ -103,6 +107,10 @@ export class Scanner {
     return new RootExpr(this.exprList);
   }
 
+  /**
+   * Parses one token.
+   * @returns The parsed expression.
+   */
   scanToken(): Expr {
     const c = this.advance();
 
@@ -124,6 +132,12 @@ export class Scanner {
     }
   }
 
+  /**
+   * Parses a surrounding expression.
+   * @param surroundCharacter The current character surrounding the inner string.
+   * @param replaceCharacter The character the surrounding character should be replaced by.
+   * @returns A SurroundExpr containing the replaceCharacter and the surrounded string.
+   */
   private surroundExpr(
     surroundCharacter: string,
     replaceCharacter: string,
@@ -197,7 +211,11 @@ export class Scanner {
     );
   }
 
-  private link(): Expr {
+  /**
+   * Parses a link.
+   * @returns A RootExpr if malformed or a LinkExpr if the link is properly formed.
+   */
+  private link(): RootExpr | LinkExpr {
     const start = this.current;
     while (this.peek() !== "|" && !this.isAtEnd()) {
       this.advance();
@@ -233,6 +251,10 @@ export class Scanner {
     return new LinkExpr(title, link);
   }
 
+  /**
+   * Parses an inline code block.
+   * @returns A RootExpr if malformed or a StringExpr is the code is properly formed,
+   */
   private inlineCode(): Expr {
     this.start = this.current - 1;
     while (this.peek() !== "`" && !this.isAtEnd()) {
@@ -254,6 +276,10 @@ export class Scanner {
     return new StringExpr(this.source.substring(this.start, this.current));
   }
 
+  /**
+   * Parses a code block,
+   * @returns A RootExpr if malformed or a CodeExpr if the code is properly formed,
+   */
   private codeBlock(): Expr {
     this.start = this.current;
 
@@ -276,14 +302,24 @@ export class Scanner {
     return new CodeExpr(this.source.substring(this.start, this.current - 1));
   }
 
+  /**
+   * @returns If the current character is at the end.
+   */
   private isAtEnd(): boolean {
     return this.current >= this.source.length;
   }
 
+  /**
+   * Consumes one character.
+   * @returns The consumed character.
+   */
   private advance(): string {
     return this.source.charAt(this.current++);
   }
 
+  /**
+   * @returns The next character.
+   */
   private peek(): string {
     if (this.isAtEnd()) return "\0";
 
