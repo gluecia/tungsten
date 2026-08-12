@@ -187,7 +187,12 @@ export class Scanner {
         break;
       }
     }
-    return new StringExpr(this.source.substring(this.start, this.current).replace(/(\\)(.)/gm, '$2'));
+    return new StringExpr(
+      this.source.substring(this.start, this.current).replace(
+        /(\\)(.)/gm,
+        "$2",
+      ),
+    );
   }
 
   private link(): Expr {

@@ -29,8 +29,8 @@ Deno.test("Text", async (t) => {
 
   await t.step("Escaping Characters 2", () => {
     const scanner = new Scanner(`\\\\`);
-    assertEquals(scanner.scan().render(), "\\")
-  })
+    assertEquals(scanner.scan().render(), "\\");
+  });
 });
 
 Deno.test("Heading", async (t) => {
@@ -67,7 +67,7 @@ Deno.test("Heading", async (t) => {
   await t.step("Midline", () => {
     const scanner = new Scanner("test * H1");
     assertEquals(scanner.scan().render(), "test * H1");
-  })
+  });
 });
 
 Deno.test("Links", async (t) => {
